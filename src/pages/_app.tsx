@@ -1,11 +1,16 @@
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import React from 'react';
+import { SWRConfig } from 'swr';
 
 import '@/styles/globals.css';
 // !STARTERCONF This is for demo purposes, remove @/styles/colors.css import immediately
 import '@/styles/colors.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+
+import axiosClient from '@/lib/axios';
+
+import { AuthProvider } from '@/contexts/auth';
 
 /**
  * !STARTERCONF info
@@ -14,16 +19,26 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <React.Fragment>
-      <Head>
-        <meta
-          name='viewport'
-          content='width=device-width, initial-scale=1, shrink-to-fit=no'
-        />
-        <title>Notus NextJS by Creative Tim</title>
-      </Head>
-      <Component {...pageProps} />
-    </React.Fragment>
+    <>
+      <SWRConfig
+        value={{
+          fetcher: (url) => axiosClient.get(url).then((res) => res.data),
+        }}
+      >
+        <AuthProvider>
+          <React.Fragment>
+            <Head>
+              <meta
+                name='viewport'
+                content='width=device-width, initial-scale=1, shrink-to-fit=no'
+              />
+              <title>Notus NextJS by Creative Tim</title>
+            </Head>
+            <Component {...pageProps} />
+          </React.Fragment>
+        </AuthProvider>
+      </SWRConfig>
+    </>
   );
 }
 
