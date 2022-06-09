@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
+import useSWR from 'swr';
 
 import axiosClient from '@/lib/axios';
 
@@ -28,6 +29,9 @@ const inventories = [
 ];
 
 const Create_mitra = () => {
+  const { data: inventories, error: inventoriesError } = useSWR(
+    '/product/categories'
+  );
   const [passwordConfirmed, setPasswordConfirmed] = useState(false);
   const [register, setRegister] = useState({
     name: '',
@@ -38,10 +42,6 @@ const Create_mitra = () => {
     email: '',
     inventory_id: '',
   });
-
-  useEffect(() => {
-    console.log(passwordConfirmed);
-  }, [passwordConfirmed]);
 
   const handleConfirmPasswordChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -73,6 +73,9 @@ const Create_mitra = () => {
       error: 'Gagal mendaftar',
     });
   };
+
+  if (inventoriesError) return <>Error loading page</>;
+  if (!inventories) return <>Loading page...</>;
 
   return (
     <Admin>
@@ -180,7 +183,7 @@ const Create_mitra = () => {
           <div className=''>
             <p>Pilih Gudang</p>
             <ComboboxComp
-              items={inventories}
+              items={inventories.data}
               name='inventory_id'
               handleChange={handleChange}
             />
